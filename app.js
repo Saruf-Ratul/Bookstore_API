@@ -19,8 +19,8 @@ app.use(express.json());
 // Routes
 app.use('/auth', authRoutes);
 app.use('/books', bookRoutes);
-// app.use('/cart', cartRoutes);
-// app.use('/orders', orderRoutes);
+app.use('/cart', cartRoutes);
+app.use('/orders', orderRoutes);
 
 // Swagger API documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
