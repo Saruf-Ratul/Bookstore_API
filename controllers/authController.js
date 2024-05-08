@@ -23,4 +23,25 @@ const login = async(req, res) => {
     }
 };
 
-module.exports = { login };
+const register = async(req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        // Check if the username is already taken
+        const existingUser = await User.findOne({ username });
+        if (existingUser) {
+            return res.status(400).json({ message: 'Username is already taken' });
+        }
+        // Create a new user
+        const user = await User.create({ username, password });
+        // Generate JWT token
+        const token = jwtService.generateToken({ userId: user._id });
+        // Send the token as a response
+        res.json({ token });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+    // res.status(201).json({ message: 'User created successfully' });
+}
+
+module.exports = { login, register };

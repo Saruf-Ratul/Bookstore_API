@@ -5,9 +5,9 @@ const bookController = require('../controllers/bookController');
 const { requireAuth } = require('../middleware/authMiddleware');
 
 // CRUD operations for books
-router.get('/', bookController.getAllBooks);
+router.get('/', bookController.getBooks);
 router.post('/', requireAuth, bookController.createBook);
-router.get('/:id', bookController.getBookById);
+router.get('/:id', bookController.getBook);
 router.put('/:id', requireAuth, bookController.updateBook);
 router.delete('/:id', requireAuth, bookController.deleteBook);
 
