@@ -1,19 +1,26 @@
-// swagger.js
-const swaggerJsdoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
+// authController.js
+const User = require('../models/user');
+const jwtService = require('../services/jwtService');
 
-const options = {
-    definition: {
-        openapi: '3.0.0',
-        info: {
-            title: 'Bookstore API',
-            version: '1.0.0',
-            description: 'API documentation for the Bookstore application'
+const login = async(req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        // Check if the username and password are valid
+        const user = await User.findOne({ username, password });
+
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid username or password' });
         }
-    },
-    apis: ['./routes/*.js']
+
+        // Generate JWT token
+        const token = jwtService.generateToken({ userId: user._id });
+
+        // Send the token as a response
+        res.json({ token });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
 
-const specs = swaggerJsdoc(options);
-
-module.exports = { specs, swaggerUi };
+module.exports = { login };
