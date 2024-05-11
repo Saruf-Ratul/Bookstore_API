@@ -9,10 +9,11 @@ const addToCart = async(req, res) => {
 
     try {
         // Check if the book exists
-        const book = await Book.findById(bookId);
+        const book = await Book.findOne(bookId.bookId);
         if (!book) {
             return res.status(404).json({ message: 'Book not found' });
         }
+
         // Add the book to the cart
         let cart = await Cart.findOne({ userId });
         if (!cart) {
@@ -21,12 +22,13 @@ const addToCart = async(req, res) => {
                 items: []
             });
         }
-        const existingItemIndex = cart.items.findIndex(item => item.bookId.equals(bookId));
-        // if (existingItemIndex !== -1) {
-        //     cart.items[existingItemIndex].quantity += quantity;
-        // } else {
-        //     cart.items.push({ bookId, quantity });
-        // }
+        const existingItemIndex = cart.items.findIndex(item => item.bookId.equals(book._id));
+        if (existingItemIndex !== -1) {
+            cart.items[existingItemIndex].quantity += quantity;
+            console.log(existingItemIndex)
+        } else {
+            cart.items.push({ bookId: book._id, quantity });
+        }
 
         await cart.save();
         res.json(cart);
@@ -35,6 +37,7 @@ const addToCart = async(req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
 
 // Get the user's cart
 const getCart = async(req, res) => {
