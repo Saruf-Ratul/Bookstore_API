@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  bookstore-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: bookstore-api
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+volumes:
+  mongodb_data:
