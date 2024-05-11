@@ -6,33 +6,42 @@ const Book = require('../models/book');
 // Place an order
 const placeOrder = async(req, res) => {
     const userId = req.user.userId;
-    console.log(userId);
+    // console.log(userId);
 
     try {
         const book = await Book.find();
-        console.log("first", book)
-
+        // console.log("first", book)
         const quantityAll = await Cart.findOne({ userId: userId });
-        const quantity = quantityAll.quantity;
-        console.log("secend", quantityAll)
+        // console.log("secend", quantityAll)
+        if (!quantityAll) {
+            // Handle the case where the cart is empty
+            console.log('Cart is empty');
+            return;
+        }
+        let totalPriceitem = 0;
+        quantityAll.items.forEach(cartItem => {
+            const bookInCart = book.find(item => item._id.equals(cartItem.book));
+            if (bookInCart) {
+                totalPriceitem += bookInCart.price * cartItem.quantity;
+            }
+        });
 
+        // console.log("Total Price:", totalPriceitem);
 
         // Get the user's cart
         const cart = await Cart.findOne({ userId });
+        console.log(cart);
         if (!cart || cart.items.length === 0) {
             return res.status(400).json({ message: 'Cart is empty' });
         }
-        const totalPrice = cart.items.reduce((total, item) => {
-            const bookPrice = item.book.price; // Get the price of the book associated with the item
-            const itemTotalPrice = bookPrice * item.quantity; // Calculate the total price for this item
-            return total + itemTotalPrice; // Add the item's total price to the running total
-        }, 0);
         // Create a new order
         const order = new Order({
             userId,
-            items: cart.items,
-            totalPrice: totalPrice
-
+            items: cart.items.map(cartItem => ({
+                bookId: cartItem.book,
+                quantity: cartItem.quantity
+            })),
+            totalPrice: totalPriceitem
         });
 
         // Clear the user's cart
