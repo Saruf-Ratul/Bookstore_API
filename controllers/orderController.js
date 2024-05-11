@@ -1,23 +1,38 @@
 // orderController.js
 const Order = require('../models/order');
 const Cart = require('../models/cart');
+const Book = require('../models/book');
 
 // Place an order
 const placeOrder = async(req, res) => {
     const userId = req.user.userId;
+    console.log(userId);
 
     try {
+        const book = await Book.find();
+        console.log("first", book)
+
+        const quantityAll = await Cart.findOne({ userId: userId });
+        const quantity = quantityAll.quantity;
+        console.log("secend", quantityAll)
+
+
         // Get the user's cart
         const cart = await Cart.findOne({ userId });
         if (!cart || cart.items.length === 0) {
             return res.status(400).json({ message: 'Cart is empty' });
         }
-
+        const totalPrice = cart.items.reduce((total, item) => {
+            const bookPrice = item.book.price; // Get the price of the book associated with the item
+            const itemTotalPrice = bookPrice * item.quantity; // Calculate the total price for this item
+            return total + itemTotalPrice; // Add the item's total price to the running total
+        }, 0);
         // Create a new order
         const order = new Order({
             userId,
             items: cart.items,
-            totalPrice: cart.items.reduce((total, item) => total + item.bookId.price * item.quantity, 0)
+            totalPrice: totalPrice
+
         });
 
         // Clear the user's cart

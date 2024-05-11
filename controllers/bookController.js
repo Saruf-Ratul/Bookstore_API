@@ -30,7 +30,7 @@ const getBooks = async(req, res) => {
 
 const getBook = async(req, res) => {
     const { id } = req.params;
-    console.log(id)
+    // console.log(id)
 
     try {
         const book = await Book.findById(id);
