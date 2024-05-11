@@ -20,6 +20,18 @@ const options = {
                 email: "saruftoratul95@gmail.com",
             },
         },
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                },
+            },
+        },
+        security: [{
+            bearerAuth: [],
+        }, ],
         paths: {
             "/auth/login": {
                 post: {
@@ -266,8 +278,8 @@ const options = {
                                         bookId: {
                                             type: "string",
                                         },
-                                        quantity: {
-                                            type: "number",
+                                        userId: {
+                                            type: "string",
                                         },
                                     }
                                 }
